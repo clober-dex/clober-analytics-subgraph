@@ -114,6 +114,7 @@ export function handleOpen(event: Open): void {
   const quote = getOrCreateToken(event.params.quote)
   const book = new Book(event.params.id.toString())
   book.quote = quote.id
+  book.unitSize = event.params.unitSize
   book.save()
 }
 
