@@ -1,0 +1,110 @@
+specVersion: 1.0.0
+schema:
+  file: ./schema.graphql
+indexerHints:
+  prune: auto
+dataSources:
+  - kind: ethereum
+    name: BookManager
+    network: monad-testnet
+    source:
+      abi: BookManager
+      address: "0xAA9575d63dFC224b9583fC303dB3188C08d5C85A"
+      startBlock: 3196033
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - CloberDayData
+        - CloberTokenDayVolume
+        - WalletDayData
+        - WalletTokenDayVolume
+      abis:
+        - name: BookManager
+          file: ./abis/BookManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: Open(indexed uint192,indexed address,indexed
+            address,uint64,uint24,uint24,address)
+          handler: handleOpen
+        - event: Make(indexed uint192,indexed address,int24,uint256,uint64,address)
+          handler: handleMake
+        - event: Take(indexed uint192,indexed address,int24,uint64)
+          handler: handleTake
+        - event: Cancel(indexed uint256,uint64)
+          handler: handleCancel
+        - event: Claim(indexed uint256,uint64)
+          handler: handleClaim
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mappings/core.ts
+  - kind: ethereum
+    name: Rebalancer
+    network: monad-testnet
+    source:
+      abi: Rebalancer
+      address: "0x6d8fa3025b6d6604309Ca257563CcA358c0CF1AA"
+      startBlock: 7546157
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - CloberDayData
+        - CloberTokenDayVolume
+        - WalletDayData
+        - WalletTokenDayVolume
+      abis:
+        - name: Rebalancer
+          file: ./abis/Rebalancer.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed bytes32,uint256,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,indexed bytes32,uint256,uint256,uint256)
+          handler: handleBurn
+      file: ./src/mappings/core.ts
+  - kind: ethereum
+    name: RouterGateway
+    network: monad-testnet
+    source:
+      abi: RouterGateway
+      address: "0xfD845859628946B317A78A9250DA251114FbD846"
+      startBlock: 12271596
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - CloberDayData
+        - CloberTokenDayVolume
+        - WalletDayData
+        - WalletTokenDayVolume
+      abis:
+        - name: RouterGateway
+          file: ./abis/RouterGateway.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,indexed
+            address,uint256,uint256,address,bytes4)
+          handler: handleSwap
+      file: ./src/mappings/core.ts

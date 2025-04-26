@@ -1,0 +1,16 @@
+{
+  "monad-testnet": {
+    "BookManager": {
+      "address": "0xAA9575d63dFC224b9583fC303dB3188C08d5C85A",
+      "startBlock": 3196033
+    },
+    "Rebalancer": {
+      "address": "0x6d8fa3025b6d6604309Ca257563CcA358c0CF1AA",
+      "startBlock": 7546157
+    },
+    "RouterGateway": {
+      "address": "0xfD845859628946B317A78A9250DA251114FbD846",
+      "startBlock": 12271596
+    }
+  }
+}
