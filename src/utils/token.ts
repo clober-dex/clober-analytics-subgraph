@@ -6,6 +6,7 @@ import { ERC20 } from '../../generated/BookManager/ERC20'
 import { ERC20NameBytes } from '../../generated/BookManager/ERC20NameBytes'
 
 import { ADDRESS_ZERO, MONAD_TESTNET } from './constants'
+import { StaticTokenDefinition } from './staticTokenDefinition'
 
 import { getChainId, isNullEthValue } from '.'
 
@@ -33,6 +34,10 @@ function getNativeTokenSymbol(chainId: i32): string {
 function fetchTokenSymbol(tokenAddress: Address, chainId: i32): string {
   if (tokenAddress.toHexString() == ADDRESS_ZERO) {
     return getNativeTokenSymbol(chainId)
+  }
+  const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
+  if (staticTokenDefinition != null) {
+    return staticTokenDefinition.symbol
   }
   const contract = ERC20.bind(tokenAddress)
   const contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress)
@@ -67,6 +72,10 @@ function fetchTokenName(tokenAddress: Address, chainId: i32): string {
   if (tokenAddress.toHexString() == ADDRESS_ZERO) {
     return getNativeTokenName(chainId)
   }
+  const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
+  if (staticTokenDefinition != null) {
+    return staticTokenDefinition.name
+  }
   const contract = ERC20.bind(tokenAddress)
   const contractNameBytes = ERC20NameBytes.bind(tokenAddress)
 
@@ -92,7 +101,10 @@ function fetchTokenDecimals(tokenAddress: Address): BigInt {
   if (tokenAddress.toHexString() == ADDRESS_ZERO) {
     return BigInt.fromI32(18)
   }
-
+  const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
+  if (staticTokenDefinition != null) {
+    return staticTokenDefinition.decimals
+  }
   const contract = ERC20.bind(tokenAddress)
   // try types uint8 for decimals
   let decimalValue = null
