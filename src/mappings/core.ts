@@ -23,13 +23,13 @@ import { createTransaction, normalizeDailyTimestamp } from '../utils'
 import { ONE_BI, ZERO_BI } from '../utils/constants'
 
 function updateDayData(event: ethereum.Event, transactionType: String): void {
-  const noarmalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
+  const normalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
 
-  const cloberDayDataKey = noarmalizedTimestamp.toString()
+  const cloberDayDataKey = normalizedTimestamp.toString()
   let cloberDayData = CloberDayData.load(cloberDayDataKey)
   if (cloberDayData === null) {
     cloberDayData = new CloberDayData(cloberDayDataKey)
-    cloberDayData.date = noarmalizedTimestamp
+    cloberDayData.date = normalizedTimestamp
     cloberDayData.txCount = ZERO_BI
     cloberDayData.walletCount = ZERO_BI
   }
@@ -37,18 +37,18 @@ function updateDayData(event: ethereum.Event, transactionType: String): void {
   const walletDayDateKey = event.transaction.from
     .toHexString()
     .concat('-')
-    .concat(noarmalizedTimestamp.toString())
+    .concat(normalizedTimestamp.toString())
   let walletDayData = WalletDayData.load(walletDayDateKey)
   if (walletDayData === null) {
     walletDayData = new WalletDayData(walletDayDateKey)
-    walletDayData.date = noarmalizedTimestamp
+    walletDayData.date = normalizedTimestamp
     walletDayData.txCount = ZERO_BI
     walletDayData.wallet = event.transaction.from
 
     cloberDayData.walletCount = cloberDayData.walletCount.plus(ONE_BI)
   }
 
-  const cloberTransactionTypeDayDataKey = noarmalizedTimestamp
+  const cloberTransactionTypeDayDataKey = normalizedTimestamp
     .toString()
     .concat('-')
     .concat(transactionType)
@@ -59,7 +59,7 @@ function updateDayData(event: ethereum.Event, transactionType: String): void {
     cloberTransactionTypeDayData = new CloberTransactionTypeDayData(
       cloberTransactionTypeDayDataKey,
     )
-    cloberTransactionTypeDayData.date = noarmalizedTimestamp
+    cloberTransactionTypeDayData.date = normalizedTimestamp
     cloberTransactionTypeDayData.cloberDayData = cloberDayData.id
     cloberTransactionTypeDayData.type = transactionType
     cloberTransactionTypeDayData.txCount = ZERO_BI
@@ -84,16 +84,16 @@ function updateTokenVolume(
   tokenAddress: Address,
   volumeAmount: BigInt,
 ): void {
-  const noarmalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
-  const cloberTokenDayVolumeKey = noarmalizedTimestamp
+  const normalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
+  const cloberTokenDayVolumeKey = normalizedTimestamp
     .toString()
     .concat('-')
     .concat(tokenAddress.toHexString())
   let cloberTokenDayVolume = CloberTokenDayVolume.load(cloberTokenDayVolumeKey)
   if (cloberTokenDayVolume === null) {
     cloberTokenDayVolume = new CloberTokenDayVolume(cloberTokenDayVolumeKey)
-    cloberTokenDayVolume.date = noarmalizedTimestamp
-    cloberTokenDayVolume.cloberDayData = noarmalizedTimestamp.toString()
+    cloberTokenDayVolume.date = normalizedTimestamp
+    cloberTokenDayVolume.cloberDayData = normalizedTimestamp.toString()
     cloberTokenDayVolume.token = tokenAddress
     cloberTokenDayVolume.volume = volumeAmount
   } else {
@@ -105,17 +105,17 @@ function updateTokenVolume(
   const walletTokenDayVolumeKey = origin
     .toHexString()
     .concat('-')
-    .concat(noarmalizedTimestamp.toString())
+    .concat(normalizedTimestamp.toString())
     .concat('-')
     .concat(tokenAddress.toHexString())
   let walletTokenDayVolume = WalletTokenDayVolume.load(walletTokenDayVolumeKey)
   if (walletTokenDayVolume === null) {
     walletTokenDayVolume = new WalletTokenDayVolume(walletTokenDayVolumeKey)
-    walletTokenDayVolume.date = noarmalizedTimestamp
+    walletTokenDayVolume.date = normalizedTimestamp
     walletTokenDayVolume.walletDayData = origin
       .toHexString()
       .concat('-')
-      .concat(noarmalizedTimestamp.toString())
+      .concat(normalizedTimestamp.toString())
     walletTokenDayVolume.token = tokenAddress
     walletTokenDayVolume.volume = volumeAmount
   } else {
