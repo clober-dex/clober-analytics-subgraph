@@ -29,6 +29,7 @@ type CloberDayData @entity {
   walletCount: BigInt!
 
   tokenVolumes: [CloberTokenDayVolume!]! @derivedFrom(field: "cloberDayData")
+  transactionTypes: [CloberTransactionTypeDayData!]! @derivedFrom(field: "cloberDayData")
 }
 
 type CloberTokenDayVolume @entity {
@@ -42,6 +43,19 @@ type CloberTokenDayVolume @entity {
   token: Bytes!
   # volume in token
   volume: BigInt!
+}
+
+type CloberTransactionTypeDayData @entity {
+  # ${timestamp rounded to current day by dividing by 86400}-${type}
+  id: ID!
+  # timestamp rounded to current day by dividing by 86400
+  date: BigInt!
+
+  cloberDayData: CloberDayData!
+  # type of transaction
+  type: String!
+  # tx
+  txCount: BigInt!
 }
 
 type WalletDayData @entity {

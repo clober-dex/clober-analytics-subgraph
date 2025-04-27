@@ -14,6 +14,7 @@ import {
   Book,
   CloberDayData,
   CloberTokenDayVolume,
+  CloberTransactionTypeDayData,
   Transaction,
   WalletDayData,
   WalletTokenDayVolume,
@@ -21,7 +22,7 @@ import {
 import { createTransaction, normalizeDailyTimestamp } from '../utils'
 import { ONE_BI, ZERO_BI } from '../utils/constants'
 
-function updateDayData(event: ethereum.Event): void {
+function updateDayData(event: ethereum.Event, transactionType: String): void {
   const noarmalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
 
   const cloberDayDataKey = noarmalizedTimestamp.toString()
@@ -47,15 +48,35 @@ function updateDayData(event: ethereum.Event): void {
     cloberDayData.walletCount = cloberDayData.walletCount.plus(ONE_BI)
   }
 
+  const cloberTransactionTypeDayDataKey = noarmalizedTimestamp
+    .toString()
+    .concat('-')
+    .concat(transactionType)
+  let cloberTransactionTypeDayData = CloberTransactionTypeDayData.load(
+    cloberTransactionTypeDayDataKey,
+  )
+  if (cloberTransactionTypeDayData === null) {
+    cloberTransactionTypeDayData = new CloberTransactionTypeDayData(
+      cloberTransactionTypeDayDataKey,
+    )
+    cloberTransactionTypeDayData.date = noarmalizedTimestamp
+    cloberTransactionTypeDayData.cloberDayData = cloberDayData.id
+    cloberTransactionTypeDayData.type = transactionType
+    cloberTransactionTypeDayData.txCount = ZERO_BI
+  }
+
   if (Transaction.load(event.transaction.hash.toHexString()) === null) {
     walletDayData.txCount = walletDayData.txCount.plus(ONE_BI)
     cloberDayData.txCount = cloberDayData.txCount.plus(ONE_BI)
+    cloberTransactionTypeDayData.txCount =
+      cloberTransactionTypeDayData.txCount.plus(ONE_BI)
 
     createTransaction(event)
   }
 
   cloberDayData.save()
   walletDayData.save()
+  cloberTransactionTypeDayData.save()
 }
 
 function updateTokenVolume(
@@ -111,7 +132,7 @@ export function handleOpen(event: Open): void {
 }
 
 export function handleMake(event: Make): void {
-  updateDayData(event)
+  updateDayData(event, 'make')
 }
 
 export function handleTake(event: Take): void {
@@ -125,7 +146,7 @@ export function handleTake(event: Take): void {
     return
   }
 
-  updateDayData(event)
+  updateDayData(event, 'take')
 
   updateTokenVolume(
     event,
@@ -135,27 +156,27 @@ export function handleTake(event: Take): void {
 }
 
 export function handleCancel(event: Cancel): void {
-  updateDayData(event)
+  updateDayData(event, 'cancel')
 }
 
 export function handleClaim(event: Claim): void {
-  updateDayData(event)
+  updateDayData(event, 'claim')
 }
 
 export function handleTransfer(event: Transfer): void {
-  updateDayData(event)
+  updateDayData(event, 'transfer')
 }
 
 export function handleMint(event: Mint): void {
-  updateDayData(event)
+  updateDayData(event, 'mint')
 }
 
 export function handleBurn(event: Burn): void {
-  updateDayData(event)
+  updateDayData(event, 'burn')
 }
 
 export function handleSwap(event: Swap): void {
-  updateDayData(event)
+  updateDayData(event, 'swap')
 
   updateTokenVolume(event, event.params.inToken, event.params.amountIn)
 }
