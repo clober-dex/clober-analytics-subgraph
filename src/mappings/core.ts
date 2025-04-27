@@ -15,12 +15,14 @@ import {
   CloberDayData,
   CloberTokenDayVolume,
   CloberTransactionTypeDayData,
+  Trade,
   Transaction,
   WalletDayData,
   WalletTokenDayVolume,
 } from '../../generated/schema'
 import { createTransaction, normalizeDailyTimestamp } from '../utils'
 import { ONE_BI, ZERO_BI } from '../utils/constants'
+import { tickToPrice, unitToBase, unitToQuote } from '../utils/math'
 
 function updateDayData(event: ethereum.Event, transactionType: String): void {
   const normalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
@@ -127,6 +129,7 @@ function updateTokenVolume(
 export function handleOpen(event: Open): void {
   const book = new Book(event.params.id.toString())
   book.quote = event.params.quote
+  book.base = event.params.base
   book.unitSize = event.params.unitSize
   book.save()
 }
@@ -148,11 +151,30 @@ export function handleTake(event: Take): void {
 
   updateDayData(event, 'take')
 
-  updateTokenVolume(
-    event,
-    Address.fromBytes(book.quote),
-    event.params.unit.times(book.unitSize),
+  const inputAmount = unitToBase(
+    book,
+    event.params.unit,
+    tickToPrice(event.params.tick),
   )
+  const outputAmount = unitToQuote(book, event.params.unit)
+
+  updateTokenVolume(event, Address.fromBytes(book.quote), outputAmount)
+
+  const trade = new Trade(
+    event.transaction.hash
+      .toHexString()
+      .concat('-')
+      .concat(event.logIndex.toString()),
+  )
+  trade.transaction = event.transaction.hash.toHexString()
+  trade.timestamp = event.block.timestamp
+  trade.inputToken = book.base
+  trade.outputToken = book.quote
+  trade.origin = event.transaction.from
+  trade.inputAmount = inputAmount
+  trade.outputAmount = outputAmount
+  trade.logIndex = event.logIndex
+  trade.save()
 }
 
 export function handleCancel(event: Cancel): void {
@@ -179,4 +201,20 @@ export function handleSwap(event: Swap): void {
   updateDayData(event, 'swap')
 
   updateTokenVolume(event, event.params.inToken, event.params.amountIn)
+
+  const trade = new Trade(
+    event.transaction.hash
+      .toHexString()
+      .concat('-')
+      .concat(event.logIndex.toString()),
+  )
+  trade.transaction = event.transaction.hash.toHexString()
+  trade.timestamp = event.block.timestamp
+  trade.inputToken = event.params.inToken
+  trade.outputToken = event.params.outToken
+  trade.origin = event.transaction.from
+  trade.inputAmount = event.params.amountIn
+  trade.outputAmount = event.params.amountOut
+  trade.logIndex = event.logIndex
+  trade.save()
 }
