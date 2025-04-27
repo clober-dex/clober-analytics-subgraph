@@ -16,7 +16,6 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Token
         - CloberDayData
         - CloberTokenDayVolume
         - WalletDayData
@@ -57,7 +56,6 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Token
         - CloberDayData
         - CloberTokenDayVolume
         - WalletDayData
@@ -89,7 +87,6 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Token
         - CloberDayData
         - CloberTokenDayVolume
         - WalletDayData

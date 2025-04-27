@@ -11,11 +11,6 @@ import {
 import { Burn, Mint } from '../../generated/Rebalancer/Rebalancer'
 import { Swap } from '../../generated/RouterGateway/RouterGateway'
 import {
-  createTransaction,
-  formatUnits,
-  normalizeDailyTimestamp,
-} from '../utils'
-import {
   Book,
   CloberDayData,
   CloberTokenDayVolume,
@@ -23,8 +18,8 @@ import {
   WalletDayData,
   WalletTokenDayVolume,
 } from '../../generated/schema'
+import { createTransaction, normalizeDailyTimestamp } from '../utils'
 import { ONE_BI, ZERO_BI } from '../utils/constants'
-import { getOrCreateToken } from '../utils/token'
 
 function updateDayData(event: ethereum.Event): void {
   const noarmalizedTimestamp = normalizeDailyTimestamp(event.block.timestamp)
@@ -73,17 +68,15 @@ function updateTokenVolume(
     .toString()
     .concat('-')
     .concat(tokenAddress.toHexString())
-  const token = getOrCreateToken(tokenAddress)
-  const amount = formatUnits(volumeAmount, token.decimals.toI32() as u8)
   let cloberTokenDayVolume = CloberTokenDayVolume.load(cloberTokenDayVolumeKey)
   if (cloberTokenDayVolume === null) {
     cloberTokenDayVolume = new CloberTokenDayVolume(cloberTokenDayVolumeKey)
     cloberTokenDayVolume.date = noarmalizedTimestamp
     cloberTokenDayVolume.cloberDayData = noarmalizedTimestamp.toString()
-    cloberTokenDayVolume.token = token.id
-    cloberTokenDayVolume.volume = amount
+    cloberTokenDayVolume.token = tokenAddress
+    cloberTokenDayVolume.volume = volumeAmount
   } else {
-    cloberTokenDayVolume.volume = cloberTokenDayVolume.volume.plus(amount)
+    cloberTokenDayVolume.volume = cloberTokenDayVolume.volume.plus(volumeAmount)
   }
   cloberTokenDayVolume.save()
 
@@ -102,18 +95,17 @@ function updateTokenVolume(
       .toHexString()
       .concat('-')
       .concat(noarmalizedTimestamp.toString())
-    walletTokenDayVolume.token = token.id
-    walletTokenDayVolume.volume = amount
+    walletTokenDayVolume.token = tokenAddress
+    walletTokenDayVolume.volume = volumeAmount
   } else {
-    walletTokenDayVolume.volume = walletTokenDayVolume.volume.plus(amount)
+    walletTokenDayVolume.volume = walletTokenDayVolume.volume.plus(volumeAmount)
   }
   walletTokenDayVolume.save()
 }
 
 export function handleOpen(event: Open): void {
-  const quote = getOrCreateToken(event.params.quote)
   const book = new Book(event.params.id.toString())
-  book.quote = quote.id
+  book.quote = event.params.quote
   book.unitSize = event.params.unitSize
   book.save()
 }
@@ -137,7 +129,7 @@ export function handleTake(event: Take): void {
 
   updateTokenVolume(
     event,
-    Address.fromString(book.quote),
+    Address.fromBytes(book.quote),
     event.params.unit.times(book.unitSize),
   )
 }

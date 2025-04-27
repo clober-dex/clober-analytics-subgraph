@@ -1,9 +1,4 @@
-import {
-  BigDecimal,
-  BigInt,
-  dataSource,
-  ethereum,
-} from '@graphprotocol/graph-ts'
+import { BigInt, dataSource, ethereum } from '@graphprotocol/graph-ts'
 
 import { Transaction } from '../../generated/schema'
 
@@ -13,15 +8,6 @@ export function isNullEthValue(value: string): boolean {
   return (
     value ==
     '0x0000000000000000000000000000000000000000000000000000000000000001'
-  )
-}
-
-export function formatUnits(
-  amount: BigInt,
-  decimals: u8 = 18 as u8,
-): BigDecimal {
-  return BigDecimal.fromString(amount.toString()).div(
-    BigDecimal.fromString(BigInt.fromI32(10).pow(decimals).toString()),
   )
 }
 
