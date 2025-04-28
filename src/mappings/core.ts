@@ -159,6 +159,7 @@ export function handleTake(event: Take): void {
   )
   const outputAmount = unitToQuote(book, event.params.unit)
 
+  updateTokenVolume(event, Address.fromBytes(book.base), inputAmount)
   updateTokenVolume(event, Address.fromBytes(book.quote), outputAmount)
 
   const trade = new Trade(
@@ -202,6 +203,7 @@ export function handleSwap(event: Swap): void {
   updateDayData(event)
 
   updateTokenVolume(event, event.params.inToken, event.params.amountIn)
+  updateTokenVolume(event, event.params.outToken, event.params.amountOut)
 
   const trade = new Trade(
     event.transaction.hash
