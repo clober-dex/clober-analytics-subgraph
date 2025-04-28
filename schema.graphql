@@ -20,6 +20,11 @@ type Transaction @entity {
   gasPrice: BigInt!
 }
 
+type Wallet @entity {
+  # wallet address
+  id: ID!
+}
+
 type Trade @entity {
   # {txHash}-{logIndex}
   id: ID!
@@ -50,6 +55,8 @@ type CloberDayData @entity {
   txCount: BigInt!
   # number of daily wallets
   walletCount: BigInt!
+  # number of daily new wallets
+  newWalletCount: BigInt!
 
   tokenVolumes: [CloberTokenDayVolume!]! @derivedFrom(field: "cloberDayData")
   transactionTypes: [CloberTransactionTypeDayData!]! @derivedFrom(field: "cloberDayData")

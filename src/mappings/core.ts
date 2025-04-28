@@ -17,6 +17,7 @@ import {
   CloberTransactionTypeDayData,
   Trade,
   Transaction,
+  Wallet,
   WalletDayData,
   WalletTokenDayVolume,
 } from '../../generated/schema'
@@ -35,6 +36,7 @@ function updateDayData(event: ethereum.Event): void {
     cloberDayData.date = normalizedTimestamp
     cloberDayData.txCount = ZERO_BI
     cloberDayData.walletCount = ZERO_BI
+    cloberDayData.newWalletCount = ZERO_BI
   }
 
   const walletDayDateKey = event.transaction.from
@@ -66,6 +68,14 @@ function updateDayData(event: ethereum.Event): void {
     cloberTransactionTypeDayData.cloberDayData = cloberDayData.id
     cloberTransactionTypeDayData.type = method
     cloberTransactionTypeDayData.txCount = ZERO_BI
+  }
+
+  let wallet = Wallet.load(event.transaction.from.toHexString())
+  if (wallet === null) {
+    cloberDayData.newWalletCount = cloberDayData.newWalletCount.plus(ONE_BI)
+
+    wallet = new Wallet(event.transaction.from.toHexString())
+    wallet.save()
   }
 
   if (Transaction.load(event.transaction.hash.toHexString()) === null) {

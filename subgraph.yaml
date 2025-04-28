@@ -16,8 +16,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - Book
+        - Transaction
+        - Wallet
+        - Trade
         - CloberDayData
         - CloberTokenDayVolume
+        - CloberTransactionTypeDayData
         - WalletDayData
         - WalletTokenDayVolume
       abis:
@@ -56,8 +61,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - Book
+        - Transaction
+        - Wallet
+        - Trade
         - CloberDayData
         - CloberTokenDayVolume
+        - CloberTransactionTypeDayData
         - WalletDayData
         - WalletTokenDayVolume
       abis:
@@ -87,8 +97,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - Book
+        - Transaction
+        - Wallet
+        - Trade
         - CloberDayData
         - CloberTokenDayVolume
+        - CloberTransactionTypeDayData
         - WalletDayData
         - WalletTokenDayVolume
       abis:
